@@ -1,0 +1,17 @@
+# Global excludes across all subdirectories
+*.o
+*.app
+*.rej
+*.deps
+*.pngc
+*.ncb
+*.suo
+*.user
+*.msi
+*.wixobj
+*.wixpdb
+*.chm
+*.tmp
+*.DS_Store
+*bin/
+*obj/

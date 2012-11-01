@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="windows-1252"?>
+
+<!--
+
+   Main Installer Script File
+
+   Dominik Deak / Bjango
+
+-->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+
+  <?include Config.wxs ?>
+  <Product Name="$(var.PROJECT_NAME)" Manufacturer="$(var.COMPANY_NAME)"
+           Id="35dece69-142e-483f-bf51-512b86d4ef16"
+           UpgradeCode="0458F821-F3A6-44B0-A709-E9726DB8E869"
+           Language="1033" Codepage="1252" Version="2.0.0">
+
+    <Package Id="*" Keywords="Installer"
+             Description="$(var.PROJECT_NAME) Installer" Manufacturer="$(var.COMPANY_NAME)"
+             Comments="$(var.PROJECT_NAME) monitors system resources and sends statistics to the iStat iOS application"
+             InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
+
+    
+    <Upgrade Id='0458F821-F3A6-44B0-A709-E9726DB8E869'>
+      <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
+        Minimum='1.0.0' IncludeMinimum='yes'
+        Maximum='2.0.0' IncludeMaximum='no' />
+    </Upgrade>
+
+	<Icon Id="icon.ico" SourceFile="iStatServer.ico"/>
+	<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+
+    
+    <!--<Property Id="MSIUSEREALADMINDETECTION"><![CDATA[1]]></Property>-->
+    <Condition Message="This user account does not have the privileges to install $(var.PROJECT_NAME). Try installing in a user account with Administrator privileges."><![CDATA[Privileged]]></Condition>
+
+    <Condition Message="$(var.PROJECT_NAME) is only supported on Windows XP, or higher.">
+      <![CDATA[Installed OR (VersionNT >= 501)]]>
+    </Condition>
+
+    <PropertyRef Id="NETFRAMEWORK40CLIENT" />
+    <PropertyRef Id="NETFRAMEWORK40FULL" />
+    <Condition Message="$(var.PROJECT_NAME) requires .NET Framework 4.0, or higher. The .NET Framework can be downloaded directly from the Microsoft web site (www.microsoft.com), or by applying the latest Windows Update on your operating system.">
+      <![CDATA[Installed OR NETFRAMEWORK40FULL OR NETFRAMEWORK40CLIENT]]>
+    </Condition>
+
+    <Media Id="1" Cabinet="package.cab" EmbedCab="yes" DiskPrompt="Package 1" />
+    <Property Id="DiskPrompt" Value="$(var.PROJECT_NAME) $(var.PROJECT_VER_STR2) Installer" />
+    <Property Id="ALLUSERS"><![CDATA[2]]></Property>
+
+    <!-- This property determines which directory's installation location is being controlled -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
+    <UIRef Id="WixUI_InstallDir_LoLicense" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.BANNER_BMP)" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.DIALOG_BMP)" />
+    
+    <!-- Install path -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder" Name="Program Files">
+        <Directory Id="INSTALLDIR" Name="$(var.PROJECT_NAME)">
+
+          <Component Id="$(var.MON_APP_EXE)" Guid="AB096598-9002-42CD-93E2-773CD6DEAF1E">
+            <File Id="File_$(var.MON_APP_EXE)" Name="$(var.MON_APP_EXE)" DiskId="1" Source="..\Frontend\bin\Release\$(var.MON_APP_EXE)" KeyPath="yes">
+              <!--<Shortcut Id="StartMenu_$(var.MON_APP_EXE)" Directory="ProgramMenuDir" Name="$(var.MON_APP_NAME)" WorkingDirectory="INSTALLDIR" Icon="$(var.MON_APP_EXE)" IconIndex="0" Advertise="yes" />-->
+              <Shortcut Id="StartMenu_$(var.MON_APP_EXE)" Directory="ProgramMenuDir" Name="$(var.MON_APP_NAME)" WorkingDirectory="INSTALLDIR" Icon="icon.ico" IconIndex="0" Advertise="yes" />
+            </File>
+            <!--<RegistrySearch Id="RegMonitorSearch" Type="raw" Root="HKU" Key="Software\$(var.COMPANY_NAME)\$(var.MON_APP_NAME)" />-->
+            <RemoveRegistryKey Root="HKU" Key="Software\$(var.COMPANY_NAME)\$(var.MON_APP_NAME)" Action="removeOnUninstall" />
+          </Component>
+
+          <!-- 32-bit executables -->
+          <Directory Id="$(var.DIR_BIN)" Name="$(var.DIR_BIN)">
+
+            <Component Id="$(var.SERVICE_EXE)" Guid="AC991C8A-8FEB-4900-8A69-2D60A02F691C">
+              <File Id="File_$(var.SERVICE_EXE)" Name="$(var.SERVICE_EXE)" DiskId="1" Source="..\Service\bin\Release\$(var.SERVICE_EXE)" KeyPath="yes" />
+              <ServiceInstall Id="Service_$(var.SERVICE_EXE)"
+                              Name="$(var.SERVICE_SERV_NAME)"
+                              DisplayName="$(var.SERVICE_DISP_NAME)"
+                              Description="Monitors system resources and sends statistics to the iStat iOS application"
+                              Account="$(var.SERVICE_ACCOUNT)"
+                              Interactive="no" Type="ownProcess"
+                              Start="auto" ErrorControl="normal"
+                              Vital="yes" />
+              <ServiceControl Id="ServiceStart" Name="$(var.SERVICE_SERV_NAME)" Start="install" Wait="no" />
+              <ServiceControl Id="ServiceStop" Name="$(var.SERVICE_SERV_NAME)" Stop="both" Wait="yes" Remove="uninstall" />
+              <fire:FirewallException Id="ServiceFirewall" File="File_$(var.SERVICE_EXE)" Name="$(var.SERVICE_DISP_NAME)" Scope="any"/>
+              <RemoveRegistryKey Root="HKU" Key="Software\$(var.COMPANY_NAME)\$(var.SERVICE_NAME)" Action="removeOnUninstall" />
+            </Component>
+
+            
+            <Component Id="OpenHardwareMonitorLicense.html" Guid="8360AA98-2F34-4123-8FEE-B7441CED720C">
+              <File Id="File_OpenHardwareMonitorLicense.html" Name="OpenHardwareMonitorLicense.html" DiskId="1" Source="..\Service\OpenHardwareMonitor\OpenHardwareMonitorLicense.html" KeyPath="yes" />
+            </Component>
+
+            <Component Id="OpenHardwareMonitorLib.dll" Guid="50615C20-771E-49A2-A8FD-C9034626744D">
+              <File Id="File_OpenHardwareMonitorLib.dll" Name="OpenHardwareMonitorLib.dll" DiskId="1" Source="..\Service\OpenHardwareMonitor\OpenHardwareMonitorLib.dll" KeyPath="yes" />
+            </Component>
+
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <!-- Entry for Add/Remove Programs in the Control Panel -->
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="$(var.PROJECT_NAME)">
+          <Component Id="ProgramMenuDir" Guid="B9CE070D-C198-491B-A0CB-871266265250">
+            <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+            <RegistryValue Root="HKMU" Key="Software\$(var.COMPANY_NAME)\$(var.MON_APP_NAME)" Type="string" Value="" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+
+    </Directory>
+    <!-- end Id="TARGETDIR" -->
+
+    <!-- Features to install -->
+    <Feature Id="Complete" Level="1" Title="$(var.PROJECT_NAME)">
+      <ComponentRef Id="OpenHardwareMonitorLicense.html" />
+      <ComponentRef Id="OpenHardwareMonitorLib.dll" />
+      <ComponentRef Id="$(var.MON_APP_EXE)" />
+      <ComponentRef Id="$(var.SERVICE_EXE)" />
+      <ComponentRef Id="ProgramMenuDir" />
+    </Feature>
+
+    <InstallExecuteSequence>
+      <RemoveExistingProducts Before="InstallInitialize" />
+    </InstallExecuteSequence>
+
+  </Product>
+
+</Wix>

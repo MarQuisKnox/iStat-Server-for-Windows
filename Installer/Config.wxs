@@ -1,0 +1,43 @@
+<!--
+
+   Installer Configuration File
+
+   Dominik Deak/Bjango
+
+-->
+
+<Include>
+
+  <!-- Project attributes -->
+  <?define PROJECT_NAME="iStat Server" ?>
+  <?define AUTHOR_NAME="Dominik Deak/Bjango" ?>
+  <?define COMPANY_NAME="Bjango" ?>
+  <?define PROJECT_VER_STR1="1.0.100.0" ?>
+  <?define PROJECT_VER_STR2="1.0.1" ?>
+
+  <!-- Monitoring application attributes -->
+  <?define MON_APP_NAME="$(var.PROJECT_NAME)" ?>
+  <?define MON_APP_EXE="iStatServer.exe" ?>
+
+  <!-- Service application attributes -->
+  <?define SERVICE_NAME="$(var.PROJECT_NAME) Service" ?>
+  <?define SERVICE_EXE="iStatServerService.exe" ?>
+  <?define SERVICE_SERV_NAME="iStatServerService" ?>
+  <?define SERVICE_DISP_NAME="$(var.PROJECT_NAME)" ?>
+  <?define SERVICE_DESC="" ?>
+  <?define SERVICE_ACCOUNT="LocalSystem" ?>
+
+  <!-- Directory names -->
+  <?define DIR_BIN32="bin32" ?>
+  
+  <!-- In the future the binary directory might be set according to CPU architecture -->
+  <?define DIR_BIN="$(var.DIR_BIN32)" ?>
+
+  <!-- Source directories -->
+  <?define SRC_DIR_BIN="..\..\$(var.DIR_BIN)" ?>
+ 
+  <!-- Installer asset files -->
+  <?define BANNER_BMP="image.installer.banner.bmp" ?>
+  <?define DIALOG_BMP="image.installer.dialog.bmp" ?>
+
+</Include>
