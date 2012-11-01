@@ -28,5 +28,5 @@ License & Copyright
 -------
 
 iStat Server is licensed under the New BSD License. For more information please see license.txt
-iStat Server is based on (iStatServer.NET)(http://istatserver.codeplex.com) by Chris Bennight.
+iStat Server is based on [iStatServer.NET](http://istatserver.codeplex.com) by Chris Bennight.
 Copyright (c) 2012, Bjango & Chris Bennight
