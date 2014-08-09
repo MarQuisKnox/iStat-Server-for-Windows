@@ -1,4 +1,4 @@
-iStat Server allows you to remotely monitor your Windows PC using [iStat for iOS](http://bjango.com/ios/istat/). iStat Server consits of a Windows Service application and a control application. The service is automatically started at boot time. The control application allows you to control the port that is used for communication and the passcode that is used for authenication.
+iStat Server allows you to remotely monitor your Windows PC using [iStat for iOS](http://bjango.com/ios/istat/). iStat Server consists of a Windows Service application and a control application. The service is automatically started at boot time. The control application allows you to control the port that is used for communication and the passcode that is used for authenication.
 
 Installing
 -------
